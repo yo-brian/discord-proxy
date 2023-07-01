@@ -1,5 +1,30 @@
 # discord-proxy
 
+## brian update 2023-07-07 直接使用bat的方式复制dll文件到discord目录
+···
+@echo off
+cd /d %~dp0
+
+set "params=%*"
+cd /d "%~dp0" && ( if exist "%temp%\getadmin.vbs" del "%temp%\getadmin.vbs" ) && fsutil dirty query %systemdrive% 1>nul 2>nul || (  echo Set UAC = CreateObject^("Shell.Application"^) : UAC.ShellExecute "cmd.exe", "/k cd ""%~sdp0"" && %~s0 %params%", "", "runas", 1 >> "%temp%\getadmin.vbs" && "%temp%\getadmin.vbs" && exit /B )
+
+
+set discordRoot=%localappdata%\Discord
+echo discordRoot
+for /d %%i in (%discordRoot%\*) do ( 
+    SETLOCAL EnableDelayedExpansion
+    set "x=%%~ni"
+    
+    if "!x:~0,4!"=="app-" (
+        xcopy /x /y version.dll  %%i\
+    )
+)
+
+cd /d %discordRoot%
+Update.exe --processStart Discord.exe --a=--proxy-server=http://127.0.0.1:10809
+exit
+···
+
 <img src="https://visitor-badge.glitch.me/badge?page_id=github-discord-proxy" alt="visitor badge"/>
 
 上篇文章中的方法已经失效了很久，也时不时有人问是否有别的设置方法，看了一圈，发现并没有比较独立的设置代理的方案，最简单的是设置系统环境变量来实现updater.node的代理，但是这个设置会影响所有系统的控制台程序。
